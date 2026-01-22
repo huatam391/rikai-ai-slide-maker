@@ -430,7 +430,8 @@ const generateAll = async () => {
           body: {
             jobId: selectedJobId.value,
             slideIndex: slideIndex,
-            language: selectedLanguage.value
+            language: selectedLanguage.value,
+            selectedModel: selectedModel.value
           }
         });
 

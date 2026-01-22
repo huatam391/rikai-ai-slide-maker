@@ -56,7 +56,7 @@ async function generateSlideElements(
 export default defineEventHandler(async (event) => {
   try {
     const body = await readBody(event);
-    const { jobId, slideIndex, language = 'English', model = 'gemini-3-pro-preview' } = body;
+    const { jobId, slideIndex, language = 'English', model = 'gemini-3-flash-preview' } = body;
 
     if (!jobId) {
       throw createError({
