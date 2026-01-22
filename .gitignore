@@ -29,5 +29,4 @@ logs
 
 # Output files
 output/
-structure/
 jobs.db
