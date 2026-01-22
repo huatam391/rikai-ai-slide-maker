@@ -1,265 +1,234 @@
-# Rikai Slide Maker - NuxtJS Version
+# HƯỚNG DẪN CHẠY ỨNG DỤNG RIKAI AI GENERATE SLIDE
 
-Hệ thống tự động tạo PowerPoint slides sử dụng AI (Google Gemini).
+**Image Docker:** `kazzan/rikai-ai-generate-slide`
+**Creator:** tam.hua@rikai.technology
 
-**Migration từ Python + Node.js sang NuxtJS hoàn toàn.**
+---
 
-## 🌟 Tính năng
+## 1. Mục đích tài liệu
 
-- ✨ Tự động tạo cấu trúc slide từ mô tả bằng AI
-- 🎨 Chỉnh sửa và tùy chỉnh slide trước khi tạo
-- 🤖 AI tự động design nội dung slide chi tiết
-- 📊 Hỗ trợ charts, tables, shapes, và images
-- 🌍 Đa ngôn ngữ: Vietnamese, Japanese, English
-- 💾 Quản lý jobs và lịch sử tạo slide
-- 🖼️ Preview PPTX bằng ảnh PNG chất lượng cao (LibreOffice)
-- 🐳 Docker support với LibreOffice tích hợp
+Tài liệu này hướng dẫn **từng bước bằng thao tác tay** để chạy ứng dụng **Rikai AI Generate Slide** bằng **Docker Desktop**, không cần dùng lệnh (command line).
 
-## 📁 Cấu trúc Project
+Ứng dụng cho phép tạo slide tự động bằng AI (Google Gemini).
 
-```
-migrate-to-nodejs/
-├── server/
-│   ├── api/                    # REST API endpoints
-│   │   ├── structure/          # Structure generation & saving
-│   │   ├── jobs/               # Job management
-│   │   └── pptx/               # PPTX generation & download
-│   ├── utils/
-│   │   ├── llm.ts              # Gemini AI integration
-│   │   ├── prompts.ts          # Prompt templates
-│   │   └── pptx-generator.ts   # PPTX generation logic
-│   └── db/
-│       └── index.ts            # SQLite database
-├── pages/
-│   └── index.vue               # Main page
-├── components/
-│   ├── DesignStructureTab.vue  # Tab 1: Design structure
-│   ├── CreateSlideTab.vue      # Tab 2: Generate PPTX
-│   └── SlideEditor.vue         # Slide editor component
-├── types/
-│   └── index.ts                # TypeScript types
-└── public/
-    └── images/                 # Slide templates
-```
+---
 
-## 🚀 Cài đặt
+## 2. Chuẩn bị trước khi chạy
 
-### 1. Prerequisites
+### 2.1. Cài đặt Docker Desktop
 
-- Node.js >= 18.x
-- npm hoặc yarn
+1. Mở trình duyệt và truy cập:
+   [https://www.docker.com/products/docker-desktop/](https://www.docker.com/products/docker-desktop/)
+2. Tải Docker Desktop phù hợp với hệ điều hành (Windows hoặc macOS)
+3. Cài đặt và **mở Docker Desktop**
+4. Kiểm tra góc trên bên trái hiển thị trạng thái:
+   **Docker Desktop is running**
 
-### 2. Clone và Install
+---
 
-```bash
-# Di chuyển vào folder
-cd migrate-to-nodejs
+### 2.2. Tạo Google API Key (AI Studio)
 
-# Install dependencies
-npm install
-```
+Ứng dụng sử dụng **Google Gemini (AI Studio)** nên cần **Google API Key**.
 
-### 3. Cấu hình Environment
+#### Các bước tạo API Key:
 
-Tạo file `.env` từ `.env.example`:
+1. Truy cập: [https://aistudio.google.com/](https://aistudio.google.com/)
+2. Đăng nhập tài khoản Google
+3. Tạo **API Key** mới
+4. Sao chép (copy) API Key để dùng ở bước sau
 
-```bash
-cp .env.example .env
-```
+---
 
-Cấu hình `GOOGLE_API_KEY` trong file `.env`:
+## 3. Lưu ý quan trọng về Billing (Thanh toán)
 
-```env
-GOOGLE_API_KEY=your_google_api_key_here
-MODEL_ID=gemini-2.0-flash-exp
-```
+### ⚠️ Trường hợp **KHÔNG setup Billing**
 
-**Lưu ý:** Để lấy Google API Key:
-1. Truy cập [Google AI Studio](https://aistudio.google.com/app/apikey)
-2. Tạo API Key mới
-3. **Quan trọng:** Thiết lập billing để sử dụng API (model Gemini 2.0 là paid)
+API Key **vẫn dùng được**, nhưng bị giới hạn:
 
-## 🏃 Chạy Development
+* Chỉ tạo được **1 file slide / ngày**
+* Tối đa **10 trang slide / ngày**
+* Chỉ sử dụng được model:
 
-### Cách 1: Development thông thường
+  ```
+  gemini-flash-2.5
+  ```
+* Phù hợp cho **test / dùng thử**
 
-```bash
-npm run dev
-```
+---
 
-Mở trình duyệt tại: **http://localhost:3000**
+### ✅ Trường hợp **ĐÃ setup Billing** (Khuyến nghị)
 
-### Cách 2: Sử dụng Docker (Recommended cho Production)
+* Không bị giới hạn số slide theo ngày (theo quota Google)
+* Tạo được slide nhiều trang
+* Phù hợp cho sử dụng thực tế, demo khách hàng, production
 
-Docker setup bao gồm LibreOffice để convert PPTX sang ảnh PNG cho preview chất lượng cao.
+📌 **Khuyến nghị:** Nếu dùng cho công việc hoặc demo chính thức → **nên bật Billing** cho Google API Key
 
-```bash
-# Build và chạy với Docker Compose
-docker-compose up -d
+---
 
-# Xem logs
-docker-compose logs -f
-```
+## 4. Tải image từ Docker Hub (không dùng lệnh)
 
-Chi tiết về Docker setup: [DOCKER.md](./DOCKER.md)
+1. Mở **Docker Desktop**
+2. Chọn tab **Images** (menu bên trái)
+3. Bấm **Search** (góc trên)
+4. Nhập:
 
-## 🏗️ Build Production
+   ```
+   kazzan/rikai-ai-generate-slide
+   ```
+5. Khi thấy image → bấm **Pull**
+6. Đợi quá trình tải hoàn tất
 
-```bash
-# Build
-npm run build
+---
 
-# Preview production build
-npm run preview
-```
+## 5. Chạy container bằng Docker Desktop
 
-## 📖 Hướng dẫn sử dụng
+### Bước 1: Run image
 
-### Tab 1: Design Slide Structure
+1. Trong Docker Desktop → tab **Images**
+2. Tìm image `kazzan/rikai-ai-generate-slide`
+3. Bấm nút **Run**
 
-1. **Nhập mô tả presentation** vào textbox
-   - Ví dụ: "Tạo presentation 10 slides về chiến lược marketing Q4 2024"
+---
 
-2. **Click "Generate Structure"** - AI sẽ tạo danh sách slides
+### Bước 2: Cấu hình container
 
-3. **Chỉnh sửa slides** (nếu cần):
-   - Sửa title và description của từng slide
-   - Thêm slide mới
-   - Xóa slide không cần
+Một cửa sổ cấu hình sẽ hiện ra. Vui lòng điền **đầy đủ các mục sau**.
 
-4. **Click "Save Structure & Create Job"** - Lưu và tạo job ID
+---
 
-### Tab 2: Create Slide
+#### 5.1. Container Name
 
-1. **Click "Refresh Jobs"** để load danh sách jobs
-
-2. **Chọn job** từ dropdown
-
-3. **Chọn ngôn ngữ** (Vietnamese/Japanese/English)
-
-4. **Click "Generate PPTX"**:
-   - Step 1: AI sẽ generate nội dung chi tiết cho từng slide
-   - Step 2: Tạo file PowerPoint
-
-5. **Download PPTX** khi hoàn thành
-
-## 🔧 API Endpoints
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/structure/generate` | POST | Tạo slide structure từ mô tả |
-| `/api/structure/save` | POST | Lưu structure và tạo job |
-| `/api/jobs` | GET | Lấy danh sách jobs |
-| `/api/pptx/generate-content` | POST | Generate content JSON với AI |
-| `/api/pptx/generate` | POST | Tạo file PPTX |
-| `/api/pptx/download/:jobId` | GET | Download file PPTX |
-| `/api/pptx/preview-images` | POST | Convert PPTX sang PNG images (LibreOffice) |
-| `/api/pptx/preview-image/:jobId/:filename` | GET | Lấy từng ảnh preview |
-| `/api/pptx/preview-html` | POST | Convert PPTX sang HTML (legacy) |
-
-## 🎯 Flow Hoạt động
+Nhập:
 
 ```
-1. User Input (mô tả presentation)
-   ↓
-2. AI Generate Structure (danh sách slides)
-   ↓
-3. User Edit & Save (tạo job)
-   ↓
-4. AI Generate Content (chi tiết từng slide)
-   ↓
-5. Generate PPTX (file PowerPoint)
-   ↓
-6. Download
+rikai-ai-generate-slide
 ```
 
-## 💾 Database
+---
 
-Sử dụng SQLite (better-sqlite3) với schema:
+#### 5.2. Ports (Cổng truy cập)
 
-```sql
-CREATE TABLE jobs (
-  job_id TEXT PRIMARY KEY,
-  file_path TEXT,
-  structure_json TEXT,     -- Slide structure JSON
-  content_json TEXT,       -- Slide content JSON
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-)
+1. Mở mục **Ports**
+2. Nhập:
+
+| Host Port | Container Port |
+| --------- | -------------- |
+| 3000      | 3000           |
+
+📌 **Lưu ý:** Container **luôn chạy ở port 3000**, host cũng map vào port **3000:3000**
+
+---
+
+#### 5.3. Environment Variables (BẮT BUỘC)
+
+1. Mở mục **Environment variables**
+2. Bấm **Add**
+3. Nhập:
+
+| Key                 | Value                |
+| ------------------- | -------------------- |
+| NUXT_GOOGLE_API_KEY | API Key từ AI Studio |
+
+📌 Ví dụ:
+
+```
+NUXT_GOOGLE_API_KEY = AIzaSyDxxxxxxxxxxxxx
 ```
 
-**Lưu trữ dữ liệu:**
-- Structure và Content JSON được lưu trực tiếp trong database (không còn files)
-- `output/*.pptx` - PowerPoint files
-- `jobs.db` - SQLite database
+---
 
-**Migration từ files sang database:**
-Nếu bạn có dữ liệu cũ từ phiên bản trước (JSON files), chạy migration:
-```bash
-npm run migrate
+### Bước 3: Chạy container
+
+* Sau khi cấu hình xong → bấm **Run**
+
+---
+
+## 6. Truy cập ứng dụng
+
+1. Mở trình duyệt (Chrome / Edge / Safari)
+2. Truy cập địa chỉ:
+
 ```
-Chi tiết xem: [MIGRATION_DB.md](./MIGRATION_DB.md)
+http://localhost:3000
+```
 
-## 🔄 Migration từ Python
+Nếu thấy giao diện ứng dụng → chạy thành công 🎉
 
-Project này được migrate từ Python + Node.js sang NuxtJS.
+---
 
-Chi tiết migration: [MIGRATION_NOTES.md](./MIGRATION_NOTES.md)
+## 7. Kiểm tra container đang chạy
 
-### So sánh
+1. Docker Desktop → tab **Containers**
+2. Kiểm tra container:
 
-| Aspect | Trước (Python) | Sau (NuxtJS) |
-|--------|---------------|--------------|
-| UI Framework | Gradio | Vue 3 + Nuxt |
-| Backend | Python FastAPI | Nuxt Nitro |
-| LLM Integration | Langchain | @google/generative-ai |
-| Database | sqlite3 (Python) | better-sqlite3 (Node) |
-| PPTX Gen | Node.js CLI | Integrated in Nuxt |
+   * Name: `rikai-ai-generate-slide`
+   * Status: **Running (màu xanh)**
 
-## 🐛 Troubleshooting
+---
 
-### Error: "GOOGLE_API_KEY is not configured"
-- Kiểm tra file `.env` có tồn tại không
-- Kiểm tra `GOOGLE_API_KEY` đã được set đúng chưa
+## 8. Xem log khi gặp lỗi
 
-### Error: Database locked
-- Đảm bảo không có process nào khác đang sử dụng `jobs.db`
+Khi ứng dụng không hoạt động hoặc tạo slide bị lỗi:
 
-### Error: Cannot find module 'pptxgenjs'
-- Chạy lại `npm install`
+1. Docker Desktop → **Containers**
+2. Click vào `rikai-ai-generate-slide`
+3. Chọn tab **Logs**
+4. Copy nội dung log để gửi cho bộ phận kỹ thuật hỗ trợ
 
-## 🖼️ PPTX Preview
+---
 
-Có 2 phương thức preview PPTX:
+## 9. Các lỗi thường gặp
 
-1. **PNG Images (Recommended)** - Sử dụng LibreOffice + poppler-utils
-   - Chất lượng cao, hiển thị chính xác như PowerPoint
-   - Convert PPTX → PDF (LibreOffice) → PNG images (pdftoppm)
-   - Mỗi slide = 1 file PNG riêng biệt
-   - Yêu cầu LibreOffice và pdftoppm (có trong Docker)
-   - API: `/api/pptx/preview-images`
+### ❌ Không mở được website
 
-2. **HTML Preview (Legacy)** - Sử dụng pptx-in-html-out
-   - Không cần LibreOffice
-   - Chất lượng thấp hơn, không chính xác
-   - API: `/api/pptx/preview-html`
+**Nguyên nhân:**
 
-## 📝 TODO
+* Port 3000 đang bị ứng dụng khác sử dụng
 
-- [x] Add PPTX to PNG conversion với LibreOffice
-- [x] Docker support
-- [x] Store structure/content JSON in database instead of files
-- [ ] Add authentication
-- [ ] Add multi-user support
-- [ ] Add slide templates
-- [ ] Add real-time preview UI component
-- [ ] Add export to PDF
-- [ ] Add API documentation (Swagger)
+**Cách xử lý:**
 
-## 📄 License
+* Stop container
+* Run lại container
+* Đổi **Host Port** thành `8080`
+* Truy cập:
 
-MIT
+```
+http://localhost:8080
+```
 
-## 👥 Contributors
+---
 
-Migrated to NuxtJS by Claude Code
+### ❌ Không tạo được slide / lỗi AI
+
+**Nguyên nhân:**
+
+* API Key sai
+* Chưa setup Billing
+
+**Cách xử lý:**
+
+* Kiểm tra lại API Key
+* Bật Billing trong Google Cloud Console nếu cần dùng đầy đủ tính năng
+
+---
+
+## 10. Tóm tắt nhanh cho người dùng
+
+* Cài Docker Desktop
+* Tạo Google API Key
+* (Tuỳ chọn) Bật Billing để không bị giới hạn
+* Pull image `kazzan/rikai-ai-generate-slide`
+* Khi Run:
+
+   * Port: `3000 → 3000`
+   * Env:
+
+     ```
+     NUXT_GOOGLE_API_KEY = API_KEY_CỦA_BẠN
+     ```
+* Mở trình duyệt: `http://localhost:3000`
+
+---
+
+**End of Document**
